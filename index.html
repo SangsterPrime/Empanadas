@@ -124,6 +124,37 @@
           </div>
         </div>
       </div>
+
+      <!-- Empanada Napolitana -->
+      <div class="menu-item">
+        <div class="item-thumb">
+          <img src="empanadas_caseras.jpg" alt="Empanada Napolitana">
+        </div>
+        <div class="item-info">
+          <h3>Empanada Napolitana</h3>
+          <p>Jamón, tomate y queso.</p>
+          <div class="options">
+            <div class="option-row">
+              <span class="option-label">Unidad</span>
+              <div class="controls">
+                <button class="icon btn btn-outline-light btn-sm" onclick="changeQty('napolitana',-1)">−</button>
+                <input type="number" min="0" value="0" class="qty" id="qty_napolitana">
+                <button class="icon btn btn-outline-light btn-sm" onclick="changeQty('napolitana',1)">+</button>
+              </div>
+              <span class="option-price">$3.000</span>
+            </div>
+            <div class="option-row">
+              <span class="option-label">Docena</span>
+              <div class="controls">
+                <button class="icon btn btn-outline-light btn-sm" onclick="changeQty('docena_napolitana',-1)">−</button>
+                <input type="number" min="0" value="0" class="qty" id="qty_docena_napolitana">
+                <button class="icon btn btn-outline-light btn-sm" onclick="changeQty('docena_napolitana',1)">+</button>
+              </div>
+              <span class="option-price">$29.000</span>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="delivery-row">
         <span class="delivery-label">Delivery</span>
         <span class="delivery-price">$2.000</span>
@@ -143,7 +174,7 @@
 
   <script>
     const phone = "56942075446";
-    const prices = { pino: 3000, queso: 3000, docena_pino: 29000, docena_queso: 29000, delivery: 2000 };
+    const prices = { pino: 3000, queso: 3000, napolitana: 3000, docena_pino: 29000, docena_queso: 29000, docena_napolitana: 29000, delivery: 2000 };
     function changeQty(type, delta) {
       const qtyInput = document.getElementById('qty_' + type);
       let val = parseInt(qtyInput.value) || 0;
@@ -156,27 +187,33 @@
     function updateTotal() {
       const qtyPino = parseInt(document.getElementById('qty_pino').value) || 0;
       const qtyQueso = parseInt(document.getElementById('qty_queso').value) || 0;
+      const qtyNapolitana = parseInt(document.getElementById('qty_napolitana').value) || 0;
       const qtyDocenaPino = parseInt(document.getElementById('qty_docena_pino').value) || 0;
       const qtyDocenaQueso = parseInt(document.getElementById('qty_docena_queso').value) || 0;
+      const qtyDocenaNapolitana = parseInt(document.getElementById('qty_docena_napolitana').value) || 0;
       const delivery = document.getElementById('deliveryCheck').checked ? prices.delivery : 0;
-      const total = qtyPino * prices.pino + qtyQueso * prices.queso + qtyDocenaPino * prices.docena_pino + qtyDocenaQueso * prices.docena_queso + delivery;
+      const total = qtyPino * prices.pino + qtyQueso * prices.queso + qtyNapolitana * prices.napolitana + qtyDocenaPino * prices.docena_pino + qtyDocenaQueso * prices.docena_queso + qtyDocenaNapolitana * prices.docena_napolitana + delivery;
       document.getElementById('totalAmount').textContent = formatCurrency(total);
       buildWhatsAppLink(qtyPino, qtyQueso, qtyDocenaPino, qtyDocenaQueso, delivery, total);
     }
     function buildWhatsAppLink(qtyPino, qtyQueso, qtyDocenaPino, qtyDocenaQueso, delivery, total) {
       let msg = "Hola! Quiero pedir:\n";
       if(qtyPino>0) msg += `- ${qtyPino} Empanada(s) de Pino\n`;
+      if(parseInt(document.getElementById('qty_napolitana').value) > 0) msg += `- ${parseInt(document.getElementById('qty_napolitana').value)} Empanada(s) Napolitana\n`;
       if(qtyDocenaPino>0) msg += `- ${qtyDocenaPino} Docena(s) de Pino\n`;
       if(qtyQueso>0) msg += `- ${qtyQueso} Empanada(s) de Queso\n`;
       if(qtyDocenaQueso>0) msg += `- ${qtyDocenaQueso} Docena(s) de Queso\n`;
+      if(parseInt(document.getElementById('qty_docena_napolitana').value) > 0) msg += `- ${parseInt(document.getElementById('qty_docena_napolitana').value)} Docena(s) Napolitana\n`;
       if(delivery>0) msg += `- Con delivery\n`;
       msg += `Total: ${formatCurrency(total)}`;
       document.getElementById('whatsappBtn').href = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
     }
     document.getElementById('qty_pino').addEventListener('change', updateTotal);
     document.getElementById('qty_queso').addEventListener('change', updateTotal);
+    document.getElementById('qty_napolitana').addEventListener('change', updateTotal);
     document.getElementById('qty_docena_pino').addEventListener('change', updateTotal);
     document.getElementById('qty_docena_queso').addEventListener('change', updateTotal);
+    document.getElementById('qty_docena_napolitana').addEventListener('change', updateTotal);
     document.getElementById('deliveryCheck').addEventListener('change', updateTotal);
     updateTotal();
   </script>
