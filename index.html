@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Menu — Empanadas Caseras</title>
+  <meta name="description" content="Escanea y ordena empanadas por WhatsApp con un click.">
+  <!-- Bootstrap CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="icon" type="image/jpeg" href="empanadas_caseras.jpg">
+  <style>
+    body{background:linear-gradient(180deg,#0b0b0b 0%, #151515 100%);color:#fff;}
+    .container{max-width:880px;margin:18px auto;padding:18px;}
+    .header{display:flex;gap:12px;align-items:center;}
+    .hero-img{width:96px;height:96px;border-radius:12px;overflow:hidden;flex-shrink:0;border:1px solid rgba(255,255,255,0.04);}
+    .hero-img img{width:100%;height:100%;object-fit:cover;display:block;}
+    h1{margin:0;font-size:20px;}
+    p.lead{margin:6px 0 0;color:#bdbdbd;}
+    .card{background:rgba(20,20,20,0.9);border-radius:14px;padding:14px;margin-top:14px;box-shadow:0 6px 24px rgba(0,0,0,.6);}
+    .menu-item{display:flex;gap:18px;align-items:center;padding:18px 6px;border-bottom:1px dashed rgba(255,255,255,0.03);}
+    .item-thumb{width:80px;height:80px;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,0.04);}
+    .item-thumb img{width:100%;height:100%;object-fit:cover;}
+    .item-info{flex:1;}
+    .item-info h3{margin:0;font-size:18px;} .item-info p{margin:4px 0 0;color:#bdbdbd;font-size:14px;}
+    .options{display:flex;flex-direction:column;gap:8px;}
+    .option-row{display:flex;align-items:center;gap:8px;}
+    .option-label{font-size:15px;min-width:90px;}
+    .controls{display:flex;gap:8px;align-items:center;}
+    .qty{width:44px;text-align:center;border-radius:8px;padding:8px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.03);color:#fff;border:none;outline:none;}
+    button.icon{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:8px;border-radius:8px;color:#fff;cursor:pointer;}
+    .option-price{font-size:15px;}
+    .summary{display:flex;justify-content:space-between;align-items:center;padding-top:10px;}
+    .total{font-weight:800;font-size:18px;}
+    .wa-btn{display:block;margin-top:12px;padding:12px;border-radius:10px;text-align:center;text-decoration:none;background:#25D366;color:#021202;font-weight:800;}
+    .small{font-size:13px;color:#bdbdbd;}
+    .delivery-row{display:flex;justify-content:space-between;align-items:center;padding:10px 6px;border-bottom:1px dashed rgba(255,255,255,0.03);}
+    .delivery-label{font-size:16px;font-weight:600;}
+    .delivery-price{font-size:16px;}
+    footer{text-align:center;margin-top:12px;color:#bdbdbd;font-size:13px;}
+    /* Mejora contraste de textos */
+    h1, h3, .option-label, .delivery-label, .total, .wa-btn, footer {
+      color: #fff !important;
+    }
+    p.lead, .item-info p, .option-price, .small {
+      color: #e0e0e0 !important;
+    }
+    .card {
+      background: #222 !important;
+    }
+    @media(max-width:560px){.header{flex-direction:row;gap:10px}.menu-item{flex-direction:column;align-items:flex-start}.item-thumb{width:64px;height:64px}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Logo en la parte superior -->
+    <div class="header">
+      <div class="hero-img">
+        <img src="empanadas_caseras.jpg" alt="Empanadas Caseras">
+      </div>
+      <div>
+        <h1>Empanadas Caseras</h1>
+        <p class="lead">¡Ordena tus empanadas favoritas y recibe en tu casa!</p>
+      </div>
+    </div>
+
+    <div class="card" id="menuCard">
+      <!-- Empanada de Pino -->
+      <div class="menu-item">
+        <div class="item-thumb">
+          <img src="empanadas_caseras.jpg" alt="Empanada de Pino">
+        </div>
+        <div class="item-info">
+          <h3>Empanada de Pino</h3>
+          <p>Carne, cebolla, huevo y aceituna.</p>
+          <div class="options">
+            <div class="option-row">
+              <span class="option-label">Unidad</span>
+              <div class="controls">
+                <button class="icon btn btn-outline-light btn-sm" onclick="changeQty('pino',-1)">−</button>
+                <input type="number" min="0" value="0" class="qty" id="qty_pino">
+                <button class="icon btn btn-outline-light btn-sm" onclick="changeQty('pino',1)">+</button>
+              </div>
+              <span class="option-price">$3.000</span>
+            </div>
+            <div class="option-row">
+              <span class="option-label">Docena</span>
+              <div class="controls">
+                <button class="icon btn btn-outline-light btn-sm" onclick="changeQty('docena_pino',-1)">−</button>
+                <input type="number" min="0" value="0" class="qty" id="qty_docena_pino">
+                <button class="icon btn btn-outline-light btn-sm" onclick="changeQty('docena_pino',1)">+</button>
+              </div>
+              <span class="option-price">$29.000</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Empanada de Queso -->
+      <div class="menu-item">
+        <div class="item-thumb">
+          <img src="empanadas_caseras.jpg" alt="Empanada de Queso">
+        </div>
+        <div class="item-info">
+          <h3>Empanada de Queso</h3>
+          <p>Queso fundido en masa dorada.</p>
+          <div class="options">
+            <div class="option-row">
+              <span class="option-label">Unidad</span>
+              <div class="controls">
+                <button class="icon btn btn-outline-light btn-sm" onclick="changeQty('queso',-1)">−</button>
+                <input type="number" min="0" value="0" class="qty" id="qty_queso">
+                <button class="icon btn btn-outline-light btn-sm" onclick="changeQty('queso',1)">+</button>
+              </div>
+              <span class="option-price">$3.000</span>
+            </div>
+            <div class="option-row">
+              <span class="option-label">Docena</span>
+              <div class="controls">
+                <button class="icon btn btn-outline-light btn-sm" onclick="changeQty('docena_queso',-1)">−</button>
+                <input type="number" min="0" value="0" class="qty" id="qty_docena_queso">
+                <button class="icon btn btn-outline-light btn-sm" onclick="changeQty('docena_queso',1)">+</button>
+              </div>
+              <span class="option-price">$29.000</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="delivery-row">
+        <span class="delivery-label">Delivery</span>
+        <span class="delivery-price">$2.000</span>
+      </div>
+      <div class="summary">
+        <span class="total" id="totalAmount">$0</span>
+        <a href="#" class="wa-btn" id="whatsappBtn">Ordenar por WhatsApp</a>
+      </div>
+      <div class="small">* El delivery se suma al total si lo seleccionas.</div>
+      <div style="margin-top:8px;">
+        <label><input type="checkbox" id="deliveryCheck"> Quiero delivery</label>
+      </div>
+    </div>
+
+    <footer>Pedidos al (+569 42075446)</footer>
+  </div>
+
+  <script>
+    const phone = "56942075446";
+    const prices = { pino: 3000, queso: 3000, docena_pino: 29000, docena_queso: 29000, delivery: 2000 };
+    function changeQty(type, delta) {
+      const qtyInput = document.getElementById('qty_' + type);
+      let val = parseInt(qtyInput.value) || 0;
+      val += delta;
+      if (val < 0) val = 0;
+      qtyInput.value = val;
+      updateTotal();
+    }
+    function formatCurrency(n){ return '$' + n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+    function updateTotal() {
+      const qtyPino = parseInt(document.getElementById('qty_pino').value) || 0;
+      const qtyQueso = parseInt(document.getElementById('qty_queso').value) || 0;
+      const qtyDocenaPino = parseInt(document.getElementById('qty_docena_pino').value) || 0;
+      const qtyDocenaQueso = parseInt(document.getElementById('qty_docena_queso').value) || 0;
+      const delivery = document.getElementById('deliveryCheck').checked ? prices.delivery : 0;
+      const total = qtyPino * prices.pino + qtyQueso * prices.queso + qtyDocenaPino * prices.docena_pino + qtyDocenaQueso * prices.docena_queso + delivery;
+      document.getElementById('totalAmount').textContent = formatCurrency(total);
+      buildWhatsAppLink(qtyPino, qtyQueso, qtyDocenaPino, qtyDocenaQueso, delivery, total);
+    }
+    function buildWhatsAppLink(qtyPino, qtyQueso, qtyDocenaPino, qtyDocenaQueso, delivery, total) {
+      let msg = "Hola! Quiero pedir:\n";
+      if(qtyPino>0) msg += `- ${qtyPino} Empanada(s) de Pino\n`;
+      if(qtyDocenaPino>0) msg += `- ${qtyDocenaPino} Docena(s) de Pino\n`;
+      if(qtyQueso>0) msg += `- ${qtyQueso} Empanada(s) de Queso\n`;
+      if(qtyDocenaQueso>0) msg += `- ${qtyDocenaQueso} Docena(s) de Queso\n`;
+      if(delivery>0) msg += `- Con delivery\n`;
+      msg += `Total: ${formatCurrency(total)}`;
+      document.getElementById('whatsappBtn').href = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+    }
+    document.getElementById('qty_pino').addEventListener('change', updateTotal);
+    document.getElementById('qty_queso').addEventListener('change', updateTotal);
+    document.getElementById('qty_docena_pino').addEventListener('change', updateTotal);
+    document.getElementById('qty_docena_queso').addEventListener('change', updateTotal);
+    document.getElementById('deliveryCheck').addEventListener('change', updateTotal);
+    updateTotal();
+  </script>
+</body>
+</html>
