@@ -226,13 +226,20 @@
       <div class="delivery-row">
         <div class="d-flex align-items-center gap-2">
           <span class="delivery-label">Delivery</span>
-          <div class="form-check form-switch m-0">
+          <span class="badge bg-success">Gratis en Villas Oeste</span>
+          <div class="form-check form-switch m-0" title="Activa para envío a domicilio">
             <input class="form-check-input" type="checkbox" id="deliveryCheck" aria-label="Activar delivery">
           </div>
         </div>
         <span class="delivery-price delivery-off" id="deliveryPrice">$0</span>
       </div>
-      <div class="small">Activa el switch para agregar delivery.</div>
+  <output class="small d-block" id="deliveryHelp">Activa el switch para agregar delivery. En Villas Oeste es GRATIS.</output>
+      <!-- Villas Oeste: delivery gratis -->
+      <div class="mt-2">
+        <button type="button" class="btn btn-outline-success btn-sm" id="villasBtn" aria-pressed="false" title="Si vives en Villas Oeste, tu delivery es gratis">
+          Vivo en Villas Oeste (delivery GRATIS)
+        </button>
+      </div>
 
       <div class="summary">
          <span class="total">Total: <span id="totalAmount">$0</span></span>
@@ -251,6 +258,8 @@
       docena_pino: 29000, docena_queso: 29000, docena_napolitana: 29000,
       terremoto: 5000, delivery: 2000
     };
+  // Flag: si es de Villas Oeste, el delivery es gratis
+  let villasGratis = false;
 
     // Utilidades
     const CLP = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 });
@@ -270,57 +279,91 @@
       return parseInt(q(id)?.value) || 0;
     }
 
-    function updateTotal(){
-      const qtyPino = readInt('qty_pino');
-      const qtyQueso = readInt('qty_queso');
-      const qtyNapolitana = readInt('qty_napolitana');
-      const qtyDocenaPino = readInt('qty_docena_pino');
-      const qtyDocenaQueso = readInt('qty_docena_queso');
-      const qtyDocenaNapolitana = readInt('qty_docena_napolitana');
-      const qtyTerremoto = readInt('qty_terremoto');
-      const deliveryChecked = q('deliveryCheck')?.checked;
-      const delivery = deliveryChecked ? prices.delivery : 0;
-
-      const total =
-        qtyPino * prices.pino +
-        qtyQueso * prices.queso +
-        qtyNapolitana * prices.napolitana +
-        qtyDocenaPino * prices.docena_pino +
-        qtyDocenaQueso * prices.docena_queso +
-        qtyDocenaNapolitana * prices.docena_napolitana +
-        qtyTerremoto * prices.terremoto +
-        delivery;
-
-      // Total visible
-      q('totalAmount').textContent = formatCurrency(total);
-
-      // Mostrar precio de delivery dinámico
-      const delEl = q('deliveryPrice');
-      if (delEl){
-        delEl.textContent = formatCurrency(delivery);
-        delEl.classList.toggle('delivery-off', !deliveryChecked);
-      }
-
-      buildWhatsAppLink({ qtyPino, qtyQueso, qtyNapolitana, qtyDocenaPino, qtyDocenaQueso, qtyDocenaNapolitana, qtyTerremoto, delivery, total });
+    // Helpers para simplificar la lógica
+    function getQuantities(){
+      return {
+        qtyPino: readInt('qty_pino'),
+        qtyQueso: readInt('qty_queso'),
+        qtyNapolitana: readInt('qty_napolitana'),
+        qtyDocenaPino: readInt('qty_docena_pino'),
+        qtyDocenaQueso: readInt('qty_docena_queso'),
+        qtyDocenaNapolitana: readInt('qty_docena_napolitana'),
+        qtyTerremoto: readInt('qty_terremoto')
+      };
     }
 
-    function buildWhatsAppLink(d){
-      let msg = "Hola! Quiero pedir:\n";
-      if (d.qtyPino>0) msg += `- ${d.qtyPino} Empanada(s) de Pino\n`;
-      if (d.qtyQueso>0) msg += `- ${d.qtyQueso} Empanada(s) de Queso\n`;
-      if (d.qtyNapolitana>0) msg += `- ${d.qtyNapolitana} Empanada(s) Napolitana\n`;
-      if (d.qtyDocenaPino>0) msg += `- ${d.qtyDocenaPino} Docena(s) de Pino\n`;
-      if (d.qtyDocenaQueso>0) msg += `- ${d.qtyDocenaQueso} Docena(s) de Queso\n`;
-      if (d.qtyDocenaNapolitana>0) msg += `- ${d.qtyDocenaNapolitana} Docena(s) Napolitana\n`;
-      if (d.qtyTerremoto>0) msg += `- ${d.qtyTerremoto} Terremoto(s) 1L\n`;
-      if (d.delivery>0) msg += `- Con delivery\n`;
-      msg += `Total: ${formatCurrency(d.total)}`;
-      const wa = q('whatsappBtn');
-      if (wa) wa.href = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+    function isDeliveryChecked(){
+      return !!q('deliveryCheck')?.checked;
+    }
+
+    function calcDelivery(deliveryChecked){
+      if (!deliveryChecked) return 0;
+      return villasGratis ? 0 : prices.delivery;
+    }
+
+    function calcTotal(qu, delivery){
+      return qu.qtyPino * prices.pino +
+             qu.qtyQueso * prices.queso +
+             qu.qtyNapolitana * prices.napolitana +
+             qu.qtyDocenaPino * prices.docena_pino +
+             qu.qtyDocenaQueso * prices.docena_queso +
+             qu.qtyDocenaNapolitana * prices.docena_napolitana +
+             qu.qtyTerremoto * prices.terremoto +
+             delivery;
+    }
+
+    function updateDeliveryUI(deliveryChecked, delivery){
+      const delEl = q('deliveryPrice');
+      if (!delEl) return;
+      delEl.textContent = (deliveryChecked && villasGratis) ? 'Gratis' : formatCurrency(delivery);
+      if (deliveryChecked && villasGratis) {
+        delEl.classList.remove('delivery-off');
+      } else {
+        delEl.classList.toggle('delivery-off', !deliveryChecked);
+      }
+    }
+
+    function updateHelpMessage(deliveryChecked){
+      const help = q('deliveryHelp');
+      if (!help) return;
+      let helpMsg = '';
+      if (villasGratis) {
+        helpMsg = 'Villas Oeste activo: tu delivery es GRATIS.';
+      } else if (deliveryChecked) {
+        helpMsg = `Delivery con costo fijo de ${formatCurrency(prices.delivery)} en otras zonas.`;
+      } else {
+        helpMsg = 'Activa el switch para agregar delivery. En Villas Oeste es GRATIS.';
+      }
+      if ('value' in help) help.value = helpMsg; else help.textContent = helpMsg;
+    }
+
+    
+
+    function updateTotal(){
+      const qu = getQuantities();
+      const deliveryChecked = isDeliveryChecked();
+      const delivery = calcDelivery(deliveryChecked);
+      const total = calcTotal(qu, delivery);
+
+      q('totalAmount').textContent = formatCurrency(total);
+      updateDeliveryUI(deliveryChecked, delivery);
+      updateHelpMessage(deliveryChecked);
+
+      buildWhatsAppLink({ ...qu, delivery, total });
+    }
+    
+    // Botón Villas Oeste: estado visual y texto
+    function setVillasBtnState(){
+      const btn = q('villasBtn');
+      if (!btn) return;
+      btn.setAttribute('aria-pressed', String(villasGratis));
+      btn.classList.toggle('btn-success', villasGratis);
+      btn.classList.toggle('btn-outline-success', !villasGratis);
+      btn.textContent = villasGratis ? 'Villas Oeste activado ✓ — delivery gratis' : 'Vivo en Villas Oeste (delivery GRATIS)';
     }
 
     // Listeners
-    ['pino','queso','napolitana','docena_pino','docena_queso','docena_napolitana','terremoto'].forEach(id=>{
+    ;['pino','queso','napolitana','docena_pino','docena_queso','docena_napolitana','terremoto'].forEach(id=>{
       const el = q('qty_'+id);
       if (el){
         el.addEventListener('input', updateTotal);
@@ -328,7 +371,15 @@
       }
     });
     q('deliveryCheck')?.addEventListener('change', updateTotal);
+    q('villasBtn')?.addEventListener('click', () => {
+      villasGratis = !villasGratis;
+      if (villasGratis && q('deliveryCheck')) q('deliveryCheck').checked = true;
+      setVillasBtnState();
+      updateTotal();
+    });
 
+    // Init
+    setVillasBtnState();
     updateTotal();
   </script>
 </body>
