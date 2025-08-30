@@ -337,6 +337,27 @@
       if ('value' in help) help.value = helpMsg; else help.textContent = helpMsg;
     }
 
+    // Construye el enlace a WhatsApp con el detalle del pedido
+    function buildWhatsAppLink(d){
+      let msg = "Hola! Quiero pedir:\n";
+      if (d.qtyPino>0) msg += `- ${d.qtyPino} Empanada(s) de Pino\n`;
+      if (d.qtyQueso>0) msg += `- ${d.qtyQueso} Empanada(s) de Queso\n`;
+      if (d.qtyNapolitana>0) msg += `- ${d.qtyNapolitana} Empanada(s) Napolitana\n`;
+      if (d.qtyDocenaPino>0) msg += `- ${d.qtyDocenaPino} Docena(s) de Pino\n`;
+      if (d.qtyDocenaQueso>0) msg += `- ${d.qtyDocenaQueso} Docena(s) de Queso\n`;
+      if (d.qtyDocenaNapolitana>0) msg += `- ${d.qtyDocenaNapolitana} Docena(s) Napolitana\n`;
+      if (d.qtyTerremoto>0) msg += `- ${d.qtyTerremoto} Terremoto(s) 1L\n`;
+      if (d.delivery>0) {
+        msg += `- Con delivery\n`;
+      }
+      if (isDeliveryChecked() && villasGratis) {
+        msg += `- Delivery gratis (Villas Oeste)\n`;
+      }
+      msg += `Total: ${formatCurrency(d.total)}`;
+      const wa = q('whatsappBtn');
+      if (wa) wa.href = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+    }
+
     
 
     function updateTotal(){
